@@ -1,348 +1,166 @@
-# E-commerce Application
-
-A modern, full-stack e-commerce application built with React, Node.js, Express, TypeScript, and Azure SQL Database. This application provides a complete shopping experience with user authentication, product management, shopping cart, and order processing.
-
-## 🏗️ Architecture
-
-This is a three-tier application consisting of:
-
-1. **Frontend**: React.js with TypeScript, Tailwind CSS, and modern UI components
-2. **Backend**: Node.js with Express.js, TypeScript, and RESTful APIs
-3. **Database**: Azure SQL Database with comprehensive schema
-
-## ✨ Features
-
-### User Features
-- 🔐 User registration and authentication
-- 👤 User profile management
-- 🛍️ Product browsing with search and filtering
-- 🛒 Shopping cart functionality
-- 📦 Order management and tracking
-- 📱 Responsive design for all devices
-
-### Admin Features
-- 📊 Product management (CRUD operations)
-- 👥 User management
-- 📈 Order management and status updates
-- 🏷️ Category management
-
-### Technical Features
-- 🔒 JWT-based authentication
-- 🛡️ Input validation and sanitization
-- 🚀 API rate limiting
-- 📊 Comprehensive error handling
-- 🐳 Docker containerization
-- 🔄 Real-time cart updates
-- 📱 Progressive Web App ready
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- Azure SQL Database instance
-- Docker and Docker Compose (optional)
-
-### 1. Clone the Repository
-
-```bash
-git clone <repository-url>
-cd workspace-lb
-```
-
-### 2. Backend Setup
-
-```bash
-cd ecommerce-app-backend
-
-# Install dependencies
-npm install
-
-# Copy environment file
-cp .env.example .env
-
-# Configure your Azure SQL Database connection in .env
-# DB_SERVER=your-server.database.windows.net
-# DB_NAME=your-database-name
-# DB_USER=your-username
-# DB_PASSWORD=your-password
-
-# Initialize the database
-# Run the SQL script in src/scripts/init-database.sql on your Azure SQL Database
-
-# Start development server
-npm run dev
-```
-
-### 3. Frontend Setup
-
-```bash
-cd ecommerce-app-frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-```
-
-### 4. Access the Application
-
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:3001
-- API Health Check: http://localhost:3001/health
-
-## 🐳 Docker Deployment
-
-### Using Docker Compose
-
-1. Create a `.env` file in the root directory:
-
-```env
-# Database Configuration
-DB_SERVER=your-server.database.windows.net
-DB_NAME=your-database-name
-DB_USER=your-username
-DB_PASSWORD=your-password
-
-# JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-here
-```
-
-2. Build and start the services:
-
-```bash
-docker-compose up --build
-```
-
-3. Access the application:
-- Frontend: http://localhost:3000
-- Backend: http://localhost:3001
-
-## 📊 Database Schema
-
-The application uses the following main tables:
-
-### Users
-- User authentication and profile information
-- Admin role management
-
-### Products
-- Product catalog with categories
-- Inventory management
-- Image URLs and descriptions
-
-### CartItems
-- Shopping cart functionality
-- User-specific cart items
-
-### Orders
-- Order management and tracking
-- Payment status and shipping information
-
-### OrderItems
-- Individual items within orders
-- Product details at time of purchase
-
-## 🔌 API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/auth/profile` - Get user profile
-- `PUT /api/auth/profile` - Update user profile
-
-### Products
-- `GET /api/products` - Get all products (with filtering)
-- `GET /api/products/:id` - Get product by ID
-- `GET /api/products/categories/list` - Get all categories
-- `POST /api/products` - Create product (Admin only)
-- `PUT /api/products/:id` - Update product (Admin only)
-- `DELETE /api/products/:id` - Delete product (Admin only)
-
-### Cart
-- `GET /api/cart` - Get user's cart
-- `POST /api/cart/add` - Add item to cart
-- `PUT /api/cart/update/:productId` - Update cart item quantity
-- `DELETE /api/cart/remove/:productId` - Remove item from cart
-- `DELETE /api/cart/clear` - Clear entire cart
-
-### Orders
-- `GET /api/orders/my-orders` - Get user's orders
-- `GET /api/orders/:id` - Get order by ID
-- `POST /api/orders/create` - Create new order
-- `POST /api/orders/create-from-cart` - Create order from cart
-- `PUT /api/orders/:id/status` - Update order status (Admin only)
-- `PUT /api/orders/:id/cancel` - Cancel order
-
-## 🛠️ Development
-
-### Backend Development
-
-```bash
-cd ecommerce-app-backend
-
-# Install dependencies
-npm install
-
-# Run in development mode
-npm run dev
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-
-# Lint code
-npm run lint
-```
-
-### Frontend Development
-
-```bash
-cd ecommerce-app-frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-
-# Build for production
-npm run build
-
-# Run tests
-npm test
-
-# Lint code
-npm run lint
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-
-#### Backend (.env)
-```env
-# Server Configuration
-PORT=3001
-NODE_ENV=development
-
-# Azure SQL Database Configuration
-DB_SERVER=your-server.database.windows.net
-DB_NAME=your-database-name
-DB_USER=your-username
-DB_PASSWORD=your-password
-DB_ENCRYPT=true
-DB_TRUST_SERVER_CERTIFICATE=false
-
-# JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-here
-JWT_EXPIRES_IN=7d
-
-# CORS Configuration
-CORS_ORIGIN=http://localhost:3000
-
-# Rate Limiting
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-```
-
-#### Frontend (.env)
-```env
-REACT_APP_API_URL=http://localhost:3001/api
-```
-
-## 🧪 Testing
-
-### Backend Testing
-```bash
-cd ecommerce-app-backend
-npm test
-```
-
-### Frontend Testing
-```bash
-cd ecommerce-app-frontend
-npm test
-```
-
-## 📦 Production Deployment
-
-### Azure Deployment
-
-1. **Backend Deployment**:
-   - Deploy to Azure App Service
-   - Configure environment variables
-   - Set up Azure SQL Database connection
-
-2. **Frontend Deployment**:
-   - Build the React app: `npm run build`
-   - Deploy to Azure Static Web Apps or Azure App Service
-
-3. **Database Setup**:
-   - Create Azure SQL Database instance
-   - Run the initialization script
-   - Configure firewall rules
-
-### Environment-Specific Configuration
-
-- **Development**: Local development with hot reloading
-- **Staging**: Docker containers with staging database
-- **Production**: Azure services with production database
-
-## 🔒 Security Features
-
-- JWT-based authentication
-- Password hashing with bcrypt
-- Input validation and sanitization
-- CORS configuration
-- Rate limiting
-- SQL injection prevention
-- XSS protection
-- CSRF protection
-
-## 📱 Mobile Responsiveness
-
-The application is fully responsive and works seamlessly on:
-- Desktop computers
-- Tablets
-- Mobile phones
-- Various screen sizes and orientations
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -am 'Add feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the repository
-- Check the documentation
-- Review the API endpoints
-
-## 🎯 Future Enhancements
-
-- [ ] Payment gateway integration (Stripe, PayPal)
-- [ ] Email notifications
-- [ ] Advanced search with Elasticsearch
-- [ ] Product reviews and ratings
-- [ ] Wishlist functionality
-- [ ] Multi-language support
-- [ ] Advanced analytics dashboard
-- [ ] Mobile app (React Native)
-- [ ] Real-time chat support
-- [ ] Inventory management system
+# 🕰️ Chronos — Haute Horlogerie E-Commerce Platform
+
+> A production-grade **three-tier web application** migrated from a single on-premises VM to a fully scalable, secure **Microsoft Azure** infrastructure.
+
+![Azure](https://img.shields.io/badge/Cloud-Microsoft%20Azure-0078D4?style=flat&logo=microsoftazure)
+![Docker](https://img.shields.io/badge/Container-Docker-2496ED?style=flat&logo=docker)
+![React](https://img.shields.io/badge/Frontend-React%2018-61DAFB?style=flat&logo=react)
+![Node](https://img.shields.io/badge/Backend-Node.js-339933?style=flat&logo=nodedotjs)
+![SQL Server](https://img.shields.io/badge/Database-SQL%20Server%202022-CC2927?style=flat&logo=microsoftsqlserver)
 
 ---
 
-Built with ❤️ using modern web technologies.
+## 📌 Project Overview
+
+**Chronos** is a luxury watch e-commerce platform. The core objective of this project is a real-world **cloud migration** — moving a legacy monolithic application from a single on-premises VM into a modern, secure, three-tier architecture on **Microsoft Azure**.
+
+The application is fully containerized with Docker for local development and deployed to Azure App Service in production, with the database isolated behind a Private Endpoint inside a Virtual Network.
+
+---
+
+## 🏗️ Azure Architecture
+
+![Architecture Diagram](./azure_3tier_architecture.svg)
+
+| Component | Azure Resource | Subnet |
+|-----------|---------------|--------|
+| Traffic Entry | Application Gateway WAF v2 | `snet-agw` |
+| Frontend | App Service `wa-frontend-ecom` | `snet-frontend` |
+| Backend | App Service `wa-backend-ecom` | `snet-backend` |
+| Database | Azure SQL Server (Private Endpoint) | `snet-privateendpoints` |
+| Monitoring | Azure Monitor + Log Analytics | — |
+| Security | NSG per subnet | All subnets |
+
+**VNet:** `vnet-prod-west` — Region: `westus2` — Address space: `10.0.0.0/16`
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Details |
+|-------|-----------|---------|
+| Frontend | React 18 + TypeScript | Served via Nginx, custom Chronos luxury theme |
+| Backend | Node.js + Express | REST API, JWT authentication |
+| Database | Microsoft SQL Server 2022 | Azure SQL via Private Endpoint |
+| Containers | Docker + Docker Compose | Multi-stage builds |
+| Cloud | Microsoft Azure | App Service, VNet, NSG, Private DNS, App Gateway |
+
+---
+
+## ✅ Completed
+
+### 🐳 Local Environment
+- [x] SQL Server 2022 container with persistent volume
+- [x] Node.js backend connected to SQL Server
+- [x] `ecommercedb` database initialized with seed data
+- [x] React frontend fully built — Chronos luxury dark theme
+- [x] All pages complete: `Home`, `Products`, `ProductDetail`, `Cart`, `Orders`, `Login`, `Register`, `Profile`
+- [x] Docker Compose orchestration with health checks and dependency ordering
+
+### ☁️ Azure Infrastructure
+- [x] Resource Group: `rg-ecommerce-prod`
+- [x] Virtual Network: `vnet-prod-west` (westus2, `10.0.0.0/16`)
+- [x] Subnets: `snet-agw`, `snet-frontend`, `snet-backend`, `snet-privateendpoints`, `snet-data`
+- [x] Network Security Groups: `nsg-agw-west`, `nsg-apps-west`, `nsg-db-west` — attached to subnets
+- [x] Azure SQL Server (`marcy`) with Private Endpoint
+- [x] Private DNS Zone for SQL Server
+- [x] App Service Plans + Web Apps: `wa-frontend-ecom`, `wa-backend-ecom` (westus2)
+
+---
+
+## 🔲 TODO — Azure Deployment
+
+- [ ] VNet Integration — attach `wa-backend-ecom` → `snet-backend`
+- [ ] VNet Integration — attach `wa-frontend-ecom` → `snet-frontend`
+- [ ] Configure backend App Service environment variables (Azure SQL connection string)
+- [ ] Deploy frontend Docker image → `wa-frontend-ecom`
+- [ ] Deploy backend Docker image → `wa-backend-ecom`
+- [ ] Create and configure Application Gateway WAF v2
+- [ ] Configure routing rules: AGW → Frontend → Backend → SQL
+- [ ] End-to-end smoke test via Azure public URL
+
+---
+
+## 🚀 Run Locally
+
+### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/) & Docker Compose
+- [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) *(for cloud steps)*
+
+### Quickstart
+```bash
+# 1. Clone the repository
+git clone https://github.com/turkanismayilzad/Devops-Project1.git
+cd Devops-Project1
+
+# 2. Start all containers
+docker compose up --build -d
+
+# 3. First time only — create the database
+docker exec -it ecom-sqlserver /opt/mssql-tools18/bin/sqlcmd \
+  -S localhost -U sa -P "YourStrong@Passw0rd" -No \
+  -Q "CREATE DATABASE ecommercedb"
+
+# 4. Restart backend so it picks up the new database
+docker compose restart backend
+
+# 5. Verify all containers are healthy
+docker compose ps
+```
+
+App runs at: **http://localhost**
+Backend API: **http://localhost:3001**
+
+### Docker Services
+```yaml
+services:
+  sqlserver:   # SQL Server 2022 — port 1433
+  backend:     # Node.js API     — port 3001
+  frontend:    # React + Nginx   — port 80
+```
+
+---
+
+## 📁 Project Structure
+```
+Devops-Project1/
+├── ecommerce-app-frontend/
+│   ├── src/
+│   │   ├── pages/          # Home, Products, ProductDetail, Cart, Orders, Login, Register, Profile
+│   │   ├── components/     # Header, ProtectedRoute
+│   │   ├── store/          # Zustand — auth & cart state
+│   │   ├── services/       # Axios API client
+│   │   └── types/          # TypeScript interfaces
+│   ├── Dockerfile          # Multi-stage: Node build → Nginx serve
+│   └── nginx.conf
+├── ecommerce-app-backend/
+│   ├── src/                # Express routes, controllers, middleware
+│   ├── healthcheck.js
+│   └── Dockerfile
+├── docker-compose.yml      # Local orchestration
+├── azure_3tier_architecture.svg
+└── README.md
+```
+
+---
+
+## 🔐 Azure Resource Reference
+
+| Resource | Name | Region |
+|----------|------|--------|
+| Resource Group | `rg-ecommerce-prod` | westus2 |
+| Virtual Network | `vnet-prod-west` | westus2 |
+| SQL Server | `marcy.database.windows.net` | westus2 |
+| Frontend App Service | `wa-frontend-ecom` | westus2 |
+| Backend App Service | `wa-backend-ecom` | westus2 |
+| NSG — Gateway | `nsg-agw-west` | westus2 |
+| NSG — Apps | `nsg-apps-west` | westus2 |
+| NSG — Database | `nsg-db-west` | westus2 |
+
+> ⚠️ Run `az login` before executing any Azure CLI commands.
+
+---
+
+## 👤 Author
+
+**Turkan Ismayilzadeh** — [@turkanismayilzad](https://github.com/turkanismayilzad)
