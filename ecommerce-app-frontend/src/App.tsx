@@ -26,25 +26,22 @@ const App: React.FC = () => {
         try {
           const response = await authAPI.getProfile();
           updateUser(response.data.user);
-        } catch (error) {
+        } catch {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
         }
       }
     };
-
     initializeApp();
   }, [user, updateUser]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchCart();
-    }
+    if (isAuthenticated) fetchCart();
   }, [isAuthenticated, fetchCart]);
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div style={{ minHeight: '100vh', background: 'var(--obsidian)' }}>
         <Header />
         <main>
           <Routes>
@@ -54,53 +51,31 @@ const App: React.FC = () => {
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/categories" element={<Products />} />
-            <Route
-              path="/cart"
-              element={
-                <ProtectedRoute>
-                  <Cart />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/orders"
-              element={
-                <ProtectedRoute>
-                  <Orders />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           </Routes>
         </main>
         <Toaster
-          position="top-right"
+          position="bottom-right"
           toastOptions={{
             duration: 4000,
             style: {
-              background: '#363636',
-              color: '#fff',
+              background: '#1A1A1A',
+              color: '#F0EAD6',
+              border: '1px solid #2A2A2A',
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: '0.78rem',
+              letterSpacing: '0.05em',
+              borderRadius: '0',
             },
             success: {
               duration: 3000,
-              iconTheme: {
-                primary: '#10B981',
-                secondary: '#fff',
-              },
+              iconTheme: { primary: '#C9A84C', secondary: '#1A1A1A' },
             },
             error: {
               duration: 5000,
-              iconTheme: {
-                primary: '#EF4444',
-                secondary: '#fff',
-              },
+              iconTheme: { primary: '#C9704C', secondary: '#1A1A1A' },
             },
           }}
         />

@@ -1,278 +1,94 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { User, Save, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Edit2, Check, X } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { authAPI } from '../services/api';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
-
-interface ProfileForm {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  country?: string;
-}
 
 const Profile: React.FC = () => {
   const { user, updateUser } = useAuthStore();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ firstName: user?.firstName || '', lastName: user?.lastName || '', email: user?.email || '' });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<ProfileForm>({
-    defaultValues: {
-      firstName: user?.firstName || '',
-      lastName: user?.lastName || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
-      address: user?.address || '',
-      city: user?.city || '',
-      state: user?.state || '',
-      zipCode: user?.zipCode || '',
-      country: user?.country || '',
-    },
-  });
-
-  const onSubmit = async (data: ProfileForm) => {
+  const handleSave = async () => {
+    setLoading(true);
     try {
-      setIsLoading(true);
-      const response = await authAPI.updateProfile(data);
-      updateUser(response.data.user);
-      setIsEditing(false);
-      toast.success('Profile updated successfully!');
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to update profile');
+      const res = await authAPI.updateProfile(form);
+      updateUser(res.data.user);
+      toast.success('Profile updated');
+      setEditing(false);
+    } catch {
+      toast.error('Failed to update profile');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    reset();
-    setIsEditing(false);
-  };
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="loading-spinner"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
-          <p className="text-gray-600 mt-2">Manage your account information</p>
-        </div>
+    <div style={{ background: 'var(--obsidian)', minHeight: '100vh' }}>
+      <div style={{ background: 'var(--deep)', borderBottom: '1px solid var(--border)', padding: '4rem 2rem 3rem', textAlign: 'center' }}>
+        <span className="section-label mb-4">Account</span>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300, color: 'var(--text-primary)', letterSpacing: '0.05em', margin: '1rem 0' }}>My Profile</h1>
+        <div style={{ width: '50px', height: '1px', background: 'var(--gold)', margin: '0 auto' }} />
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Overview */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <User className="h-5 w-5" />
-                  <span>Profile Overview</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white text-2xl font-bold">
-                      {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {user.firstName} {user.lastName}
-                  </h3>
-                  <p className="text-gray-600">{user.email}</p>
-                  {user.isAdmin && (
-                    <span className="inline-block mt-2 px-2 py-1 bg-primary-100 text-primary-800 text-xs font-medium rounded-full">
-                      Admin
-                    </span>
-                  )}
-                </div>
-                
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Member since:</span>
-                    <span className="font-medium">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Last updated:</span>
-                    <span className="font-medium">
-                      {new Date(user.updatedAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+      <div className="max-w-2xl mx-auto px-6 lg:px-8 py-12">
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '3rem' }}>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: '56px', height: '56px', border: '1px solid var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <User style={{ color: 'var(--gold)' }} className="h-6 w-6" />
+              </div>
+              <div>
+                <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.5rem', fontWeight: 300, color: 'var(--text-primary)' }}>
+                  {user?.firstName} {user?.lastName}
+                </h2>
+                <span style={{ fontSize: '0.65rem', letterSpacing: '0.2em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Member</span>
+              </div>
+            </div>
+            {!editing ? (
+              <button onClick={() => setEditing(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'none', border: '1px solid var(--border)', color: 'var(--text-muted)', padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', transition: 'all 0.3s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--gold)'; e.currentTarget.style.color = 'var(--gold)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}>
+                <Edit2 className="h-3 w-3" /> Edit
+              </button>
+            ) : (
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button onClick={handleSave} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'var(--gold)', border: 'none', color: 'var(--obsidian)', padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                  <Check className="h-3 w-3" /> Save
+                </button>
+                <button onClick={() => setEditing(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'none', border: '1px solid var(--border)', color: 'var(--text-muted)', padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                  <X className="h-3 w-3" /> Cancel
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Profile Form */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Personal Information</CardTitle>
-                  {!isEditing && (
-                    <Button onClick={() => setIsEditing(true)}>
-                      Edit Profile
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Input
-                        {...register('firstName', {
-                          required: 'First name is required',
-                          minLength: {
-                            value: 2,
-                            message: 'First name must be at least 2 characters',
-                          },
-                        })}
-                        type="text"
-                        label="First Name"
-                        disabled={!isEditing}
-                        error={errors.firstName?.message}
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        {...register('lastName', {
-                          required: 'Last name is required',
-                          minLength: {
-                            value: 2,
-                            message: 'Last name must be at least 2 characters',
-                          },
-                        })}
-                        type="text"
-                        label="Last Name"
-                        disabled={!isEditing}
-                        error={errors.lastName?.message}
-                      />
-                    </div>
+          <div style={{ borderTop: '1px solid var(--border)', paddingTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {[
+              { label: 'First Name', key: 'firstName', icon: <User className="h-4 w-4" />, type: 'text' },
+              { label: 'Last Name', key: 'lastName', icon: <User className="h-4 w-4" />, type: 'text' },
+              { label: 'Email Address', key: 'email', icon: <Mail className="h-4 w-4" />, type: 'email' },
+            ].map(field => (
+              <div key={field.key}>
+                <label style={{ display: 'block', fontSize: '0.6rem', letterSpacing: '0.25em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                  {field.label}
+                </label>
+                {editing ? (
+                  <input type={field.type} value={form[field.key as keyof typeof form]}
+                    onChange={e => setForm(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    className="input" />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                    <span style={{ color: 'var(--gold)' }}>{field.icon}</span>
+                    <span style={{ color: 'var(--text-primary)', fontSize: '0.85rem', letterSpacing: '0.05em' }}>
+                      {form[field.key as keyof typeof form]}
+                    </span>
                   </div>
-
-                  <div>
-                    <Input
-                      {...register('email', {
-                        required: 'Email is required',
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'Invalid email address',
-                        },
-                      })}
-                      type="email"
-                      label="Email Address"
-                      disabled={!isEditing}
-                      error={errors.email?.message}
-                    />
-                  </div>
-
-                  <div>
-                    <Input
-                      {...register('phone')}
-                      type="tel"
-                      label="Phone Number"
-                      disabled={!isEditing}
-                      error={errors.phone?.message}
-                    />
-                  </div>
-
-                  <div>
-                    <Input
-                      {...register('address')}
-                      type="text"
-                      label="Address"
-                      disabled={!isEditing}
-                      error={errors.address?.message}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Input
-                        {...register('city')}
-                        type="text"
-                        label="City"
-                        disabled={!isEditing}
-                        error={errors.city?.message}
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        {...register('state')}
-                        type="text"
-                        label="State"
-                        disabled={!isEditing}
-                        error={errors.state?.message}
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        {...register('zipCode')}
-                        type="text"
-                        label="ZIP Code"
-                        disabled={!isEditing}
-                        error={errors.zipCode?.message}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Input
-                      {...register('country')}
-                      type="text"
-                      label="Country"
-                      disabled={!isEditing}
-                      error={errors.country?.message}
-                    />
-                  </div>
-
-                  {isEditing && (
-                    <div className="flex space-x-4 pt-6 border-t border-gray-200">
-                      <Button
-                        type="submit"
-                        loading={isLoading}
-                        disabled={isLoading}
-                      >
-                        <Save className="mr-2 h-4 w-4" />
-                        Save Changes
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleCancel}
-                        disabled={isLoading}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  )}
-                </form>
-              </CardContent>
-            </Card>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>

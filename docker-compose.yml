@@ -1,52 +1,79 @@
+version: '3.8'
+
 services:
-  # Backend API
+
+  # ── DATABASE ─────────────────────────────────────────────
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ecom-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrong@Passw0rd"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q 'SELECT 1' -No -C || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - ecom-network
+
+  # ── BACKEND ──────────────────────────────────────────────
   backend:
     build:
       context: ./ecommerce-app-backend
       dockerfile: Dockerfile
-    container_name: ecommerce-backend
+    container_name: ecom-backend
+    env_file:
+      - .env
+    environment:
+      DB_SERVER: sqlserver
+      DB_NAME: ecommercedb
+      DB_USER: sa
+      DB_PASSWORD: YourStrong@Passw0rd
+      DB_ENCRYPT: "false"
+      DB_TRUST_SERVER_CERTIFICATE: "true"
+      NODE_ENV: development
+      PORT: 3001
     ports:
       - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-      - DB_SERVER=${DB_SERVER}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_ENCRYPT=true
-      - DB_TRUST_SERVER_CERTIFICATE=false
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRES_IN=7d
-      - CORS_ORIGIN=http://localhost:3000
-    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "healthcheck.js"]
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3001/health', r => process.exit(r.statusCode === 200 ? 0 : 1))\""]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 10
+      start_period: 90s
+    networks:
+      - ecom-network
+    restart: unless-stopped
 
-  # Frontend React App
+  # ── FRONTEND ─────────────────────────────────────────────
   frontend:
     build:
       context: ./ecommerce-app-frontend
       dockerfile: Dockerfile
-    container_name: ecommerce-frontend
+    container_name: ecom-frontend
     ports:
-      - "3000:80"
-    environment:
-      - REACT_APP_API_URL=http://localhost:3001/api
+      - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    networks:
+      - ecom-network
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+
+# ── VOLUMES & NETWORKS ───────────────────────────────────
+volumes:
+  sqlserver-data:
 
 networks:
-  default:
-    name: ecommerce-network
+  ecom-network:
+    driver: bridge

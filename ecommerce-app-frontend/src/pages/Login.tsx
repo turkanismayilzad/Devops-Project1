@@ -1,164 +1,75 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { authAPI } from '../services/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
 import toast from 'react-hot-toast';
 
-interface LoginForm {
-  email: string;
-  password: string;
-}
-
 const Login: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginForm>();
-
-  const onSubmit = async (data: LoginForm) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
     try {
-      setIsLoading(true);
-      const response = await authAPI.login(data);
-      
-      login(response.data.user, response.data.token);
-      toast.success('Login successful!');
+      const res = await authAPI.login({ email, password });
+      login(res.data.user, res.data.token);
+      toast.success('Welcome back');
       navigate('/');
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Login failed');
+    } catch {
+      toast.error('Invalid credentials');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-primary-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl">E</span>
+    <div style={{ background: 'var(--obsidian)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div style={{ width: '100%', maxWidth: '420px' }}>
+        <div className="text-center mb-12">
+          <span className="section-label mb-4">Welcome</span>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '3rem', fontWeight: 300, color: 'var(--text-primary)', letterSpacing: '0.05em', margin: '1rem 0' }}>
+            Sign In
+          </h1>
+          <div style={{ width: '40px', height: '1px', background: 'var(--gold)', margin: '0 auto' }} />
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.6rem', letterSpacing: '0.25em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+              Email Address
+            </label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="input" placeholder="your@email.com" />
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Or{' '}
-            <Link
-              to="/register"
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
-              create a new account
-            </Link>
-          </p>
-        </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.6rem', letterSpacing: '0.25em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+              Password
+            </label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className="input" placeholder="••••••••" />
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome back</CardTitle>
-            <CardDescription>
-              Enter your credentials to access your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <Input
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Invalid email address',
-                    },
-                  })}
-                  type="email"
-                  label="Email address"
-                  placeholder="Enter your email"
-                  error={errors.email?.message}
-                />
-              </div>
+          <button type="submit" disabled={loading} style={{
+            background: loading ? 'var(--gold-dark)' : 'var(--gold)',
+            color: 'var(--obsidian)', padding: '1rem', fontSize: '0.7rem',
+            letterSpacing: '0.25em', textTransform: 'uppercase',
+            fontFamily: 'Raleway, sans-serif', fontWeight: 500,
+            border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+            transition: 'background 0.3s', marginTop: '0.5rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+          }}>
+            {loading ? <><div className="loading-spinner" style={{ width: '16px', height: '16px' }} /> Signing In...</> : 'Sign In'}
+          </button>
+        </form>
 
-              <div>
-                <div className="relative">
-                  <Input
-                    {...register('password', {
-                      required: 'Password is required',
-                      minLength: {
-                        value: 6,
-                        message: 'Password must be at least 6 characters',
-                      },
-                    })}
-                    type={showPassword ? 'text' : 'password'}
-                    label="Password"
-                    placeholder="Enter your password"
-                    error={errors.password?.message}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                    Remember me
-                  </label>
-                </div>
-
-                <div className="text-sm">
-                  <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
-                    Forgot your password?
-                  </a>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                loading={isLoading}
-                disabled={isLoading}
-              >
-                Sign in
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link
-              to="/register"
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
-              Sign up here
-            </Link>
-          </p>
-        </div>
+        <p className="text-center mt-8" style={{ color: 'var(--text-muted)', fontSize: '0.75rem', letterSpacing: '0.08em' }}>
+          New to Chronos?{' '}
+          <Link to="/register" style={{ color: 'var(--gold)', textDecoration: 'none', borderBottom: '1px solid rgba(201,168,76,0.4)', paddingBottom: '1px' }}>
+            Create an account
+          </Link>
+        </p>
       </div>
     </div>
   );
