@@ -160,6 +160,3 @@ Devops-Project1/
 
 ---
 
-## 👤 Author
-
-**Turkan Ismayilzadeh** — [@turkanismayilzad](https://github.com/turkanismayilzad)
