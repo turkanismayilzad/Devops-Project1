@@ -61,22 +61,21 @@ The application is fully containerized with Docker for local development and dep
 - [x] Resource Group: `rg-ecommerce-prod`
 - [x] Virtual Network: `vnet-prod-west` (westus2, `10.0.0.0/16`)
 - [x] Subnets: `snet-agw`, `snet-frontend`, `snet-backend`, `snet-privateendpoints`, `snet-data`
-- [x] Network Security Groups: `nsg-agw-west`, `nsg-apps-west`, `nsg-db-west` — attached to subnets
-- [x] Azure SQL Server (`marcy`) with Private Endpoint
-- [x] Private DNS Zone for SQL Server
+- [x] NSGs: `nsg-agw-west`, `nsg-apps-west`, `nsg-db-west` — attached to all subnets
+- [x] Azure SQL Server (`marcy`) with Private Endpoint + Private DNS Zone
 - [x] App Service Plans + Web Apps: `wa-frontend-ecom`, `wa-backend-ecom` (westus2)
 
 ---
 
 ## 🔲 TODO — Azure Deployment
 
-- [ ] VNet Integration — attach `wa-backend-ecom` → `snet-backend`
-- [ ] VNet Integration — attach `wa-frontend-ecom` → `snet-frontend`
+- [ ] VNet Integration — attach `wa-backend-ecom` to `snet-backend`
+- [ ] VNet Integration — attach `wa-frontend-ecom` to `snet-frontend`
 - [ ] Configure backend App Service environment variables (Azure SQL connection string)
-- [ ] Deploy frontend Docker image → `wa-frontend-ecom`
-- [ ] Deploy backend Docker image → `wa-backend-ecom`
+- [ ] Deploy frontend Docker image to `wa-frontend-ecom`
+- [ ] Deploy backend Docker image to `wa-backend-ecom`
 - [ ] Create and configure Application Gateway WAF v2
-- [ ] Configure routing rules: AGW → Frontend → Backend → SQL
+- [ ] Configure routing: AGW → Frontend → Backend → SQL
 - [ ] End-to-end smoke test via Azure public URL
 
 ---
@@ -101,7 +100,7 @@ docker exec -it ecom-sqlserver /opt/mssql-tools18/bin/sqlcmd \
   -S localhost -U sa -P "YourStrong@Passw0rd" -No \
   -Q "CREATE DATABASE ecommercedb"
 
-# 4. Restart backend so it picks up the new database
+# 4. Restart backend
 docker compose restart backend
 
 # 5. Verify all containers are healthy
@@ -112,12 +111,12 @@ App runs at: **http://localhost**
 Backend API: **http://localhost:3001**
 
 ### Docker Services
-```yaml
-services:
-  sqlserver:   # SQL Server 2022 — port 1433
-  backend:     # Node.js API     — port 3001
-  frontend:    # React + Nginx   — port 80
-```
+
+| Service | Image | Port |
+|---------|-------|------|
+| sqlserver | mcr.microsoft.com/mssql/server:2022-latest | 1433 |
+| backend | custom Node.js build | 3001 |
+| frontend | custom React + Nginx build | 80 |
 
 ---
 
@@ -137,7 +136,7 @@ Devops-Project1/
 │   ├── src/                # Express routes, controllers, middleware
 │   ├── healthcheck.js
 │   └── Dockerfile
-├── docker-compose.yml      # Local orchestration
+├── docker-compose.yml
 ├── azure_3tier_architecture.svg
 └── README.md
 ```
